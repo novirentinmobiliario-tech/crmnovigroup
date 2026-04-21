@@ -734,7 +734,6 @@
     // ════════════════════════════════════════════════════
     const API = "https://script.google.com/macros/s/AKfycbwWFcQ1nlVsLyiEOFMvSbYAxPHdAqSvKP1qMCvp1BrQkhb6ctod8oSShrj1cBKWzSc/exec";
     const API_PROP = API; // Mismo script para todo
-    const CSV_PROPIEDADES = "https://docs.google.com/spreadsheets/d/1tcVf5ApvfYtGvOrIOpD4cx1e3Sois82UZA1dG2KMXe8/pub?output=csv&sheet=PROPIEDADES";
     // ════════════════════════════════════════════════════
 
     let dTar = [], dCli = [], dProp = [];
@@ -774,16 +773,9 @@
     async function cargarPropiedades() {
         document.getElementById('tblPropiedades').innerHTML = "<tr><td colspan='8'><div class='empty-state'>🔄 Cargando propiedades...</div></td></tr>";
         try {
-            // Intenta primero por CSV público (más rápido), si no, por API
-            if (CSV_PROPIEDADES && CSV_PROPIEDADES !== "TU_URL_CSV_PROPIEDADES_AQUI") {
-                let r = await fetch(CSV_PROPIEDADES);
-                let texto = await r.text();
-                dProp = parsearCSV(texto);
-            } else {
-                let r = await fetch(API + "?action=read_propiedades");
-                let j = await r.json();
-                if (j.status === 'success') dProp = j.data;
-            }
+            let r = await fetch(API + "?action=read_propiedades");
+            let j = await r.json();
+            if (j.status === 'success') dProp = j.data;
             poblarFiltroCiudad();
             renderPropiedades();
         } catch(e) {
@@ -792,28 +784,7 @@
         }
     }
 
-    function parsearCSV(texto) {
-        let lineas = texto.split('\n').filter(l => l.trim() !== '');
-        if (lineas.length < 2) return [];
-        let headers = parsearLineaCSV(lineas[0]);
-        return lineas.slice(1).map(linea => {
-            let vals = parsearLineaCSV(linea);
-            let obj = {};
-            headers.forEach((h, i) => obj[h.trim().toUpperCase()] = (vals[i] || '').trim());
-            return obj;
-        }).filter(o => Object.values(o).some(v => v));
-    }
 
-    function parsearLineaCSV(linea) {
-        let res = [], cur = '', inQ = false;
-        for (let c of linea) {
-            if (c === '"') inQ = !inQ;
-            else if (c === ',' && !inQ) { res.push(cur); cur = ''; }
-            else cur += c;
-        }
-        res.push(cur);
-        return res;
-    }
 
     function poblarFiltroCiudad() {
         let sel = document.getElementById('fProCiudad');
