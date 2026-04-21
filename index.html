@@ -730,13 +730,11 @@
 
 <script>
     // ════════════════════════════════════════════════════
-    // CONFIGURACIÓN — Reemplaza con tu URL de Apps Script
+    // CONFIGURACIÓN — Novigroup CRM
     // ════════════════════════════════════════════════════
-    const API = "TU_URL_APPS_SCRIPT_AQUI";
-    // Si usas un script separado para propiedades (como Monteclaro):
-    const API_PROP = "TU_URL_APPS_SCRIPT_PROPIEDADES_AQUI"; // Puede ser igual al API si todo está en uno
-    // CSV público de la hoja PROPIEDADES (opcional, para lectura rápida)
-    const CSV_PROPIEDADES = "TU_URL_CSV_PROPIEDADES_AQUI";
+    const API = "https://script.google.com/macros/s/AKfycbwWFcQ1nlVsLyiEOFMvSbYAxPHdAqSvKP1qMCvp1BrQkhb6ctod8oSShrj1cBKWzSc/exec";
+    const API_PROP = API; // Mismo script para todo
+    const CSV_PROPIEDADES = "https://docs.google.com/spreadsheets/d/1tcVf5ApvfYtGvOrIOpD4cx1e3Sois82UZA1dG2KMXe8/pub?output=csv&sheet=PROPIEDADES";
     // ════════════════════════════════════════════════════
 
     let dTar = [], dCli = [], dProp = [];
@@ -844,7 +842,7 @@
             let tr = document.createElement('tr');
             tr.onclick = () => abrirModalTarea(false, i);
             let fechaStr = i.FECHA ? new Date(i.FECHA).toLocaleDateString('es-CO') : '';
-            tr.innerHTML = `<td>${fechaStr}</td><td>${i.CLIENTE||''}</td><td>${i.TAREA||i.ACTIVIDAD||''}</td><td>${i.RESPONSABLE||''}</td>
+            tr.innerHTML = `<td>${fechaStr}</td><td>${i.CLIENTE||''}</td><td>${i.ACTIVIDAD||''}</td><td>${i.RESPONSABLE||''}</td>
                             <td><span class="badge ${color(i.ESTADO)}">${i.ESTADO||''}</span></td>
                             <td><small style="color:var(--muted)">${i.NOTAS||''}</small></td>`;
             tb.appendChild(tr);
@@ -918,9 +916,9 @@
         } else {
             document.getElementById('tModalTar').innerText = "Editar Tarea";
             document.getElementById('tarModo').value = "edit";
-            document.getElementById('tarId').value = item.ID || item.ID_TAREA || '';
+            document.getElementById('tarId').value = item.ID || '';
             sel.value = item.CLIENTE; sel.disabled = true;
-            document.getElementById('tarDesc').value = item.TAREA || item.ACTIVIDAD || ''; document.getElementById('tarDesc').disabled = true;
+            document.getElementById('tarDesc').value = item.ACTIVIDAD || ''; document.getElementById('tarDesc').disabled = true;
             document.getElementById('tarResp').value = item.RESPONSABLE; document.getElementById('tarResp').disabled = true;
             document.getElementById('tarEst').value = item.ESTADO || 'PENDIENTE';
             document.getElementById('tarNotas').value = item.NOTAS || '';
@@ -1009,7 +1007,7 @@
         } else {
             document.getElementById('tModalCli').innerText = "Editar Cliente";
             document.getElementById('cliModo').value = "edit";
-            document.getElementById('cliId').value = item.ID_CLIENTE || item.ID || '';
+            document.getElementById('cliId').value = item.ID_CLIENTE || '';
             document.getElementById('cliNom').value = item.NOMBRE || '';
             document.getElementById('cliCed').value = item.CEDULA_NIT || '';
             document.getElementById('cliTel').value = item.TELEFONO || '';
@@ -1033,7 +1031,7 @@
         if(modo == 'create') {
             fd.append('action','create_tarea');
             fd.append('cliente',     document.getElementById('tarCliente').value);
-            fd.append('tarea',       document.getElementById('tarDesc').value);
+            fd.append('actividad',   document.getElementById('tarDesc').value);
             fd.append('responsable', document.getElementById('tarResp').value);
             fd.append('estado',      document.getElementById('tarEst').value);
         } else {
@@ -1089,7 +1087,7 @@
                 descripcion: document.getElementById('proDescripcion').value
             };
         }
-        await enviarJSON(datos, btn, cargarPropiedades, API_PROP !== "TU_URL_APPS_SCRIPT_PROPIEDADES_AQUI" ? API_PROP : API);
+        await enviarJSON(datos, btn, cargarPropiedades, API);
     }
 
     async function guardarCliente() {
