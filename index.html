@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM Novigroup</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold:        #C9A84C;
+            --gold-light:  #E8C97A;
+            --gold-dark:   #9E7A2E;
+            --black:       #0A0A0A;
+            --dark:        #111111;
+            --dark2:       #1A1A1A;
+            --dark3:       #242424;
+            --dark4:       #2E2E2E;
+            --muted:       #888888;
+            --text:        #E8E8E8;
+            --text-soft:   #AAAAAA;
+            --border:      rgba(201,168,76,0.18);
+            --border-soft: rgba(255,255,255,0.06);
+
+            --st-pendiente:  #C9A84C;
+            --st-proceso:    #4A90D9;
+            --st-completada: #4CAF7A;
+            --st-cancelada:  #D95252;
+            --st-disponible: #4CAF7A;
+            --st-vendido:    #D95252;
+            --st-separado:   #C9A84C;
+            --st-arrendado:  #9C67C9;
+            --st-inactivo:   #555555;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--black);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ─── HEADER ─── */
+        header {
+            background: linear-gradient(135deg, var(--dark) 0%, #0D0D0D 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 60% 80% at 50% -20%, rgba(201,168,76,0.12) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 28px 24px 22px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            z-index: 1;
+        }
+        .logo-mark {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3.4rem;
+            font-weight: 700;
+            letter-spacing: 6px;
+            color: var(--gold);
+            text-transform: uppercase;
+            line-height: 1;
+            text-shadow: 0 0 40px rgba(201,168,76,0.35);
+        }
+        .logo-mark span { color: white; }
+        .header-sub {
+            font-size: 0.7rem;
+            letter-spacing: 4px;
+            color: var(--muted);
+            text-transform: uppercase;
+            font-weight: 400;
+        }
+        .header-divider {
+            width: 80px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            margin: 4px 0;
+        }
+        .header-title {
+            font-size: 0.65rem;
+            letter-spacing: 5px;
+            color: var(--gold-dark);
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        #loading {
+            position: absolute;
+            top: 12px; right: 20px;
+            background: rgba(201,168,76,0.12);
+            border: 1px solid var(--border);
+            color: var(--gold);
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: none;
+        }
+
+        /* ─── TABS ─── */
+        .tabs {
+            background: var(--dark2);
+            border-bottom: 1px solid var(--border-soft);
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 0 16px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 16px 28px;
+            cursor: pointer;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--muted);
+            border-bottom: 2px solid transparent;
+            transition: all 0.25s;
+        }
+        .tab-btn:hover { color: var(--gold-light); }
+        .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+        /* ─── CONTAINER / MODULES ─── */
+        .container { padding: 24px; max-width: 1200px; margin: 0 auto; width: 100%; flex: 1; }
+        .module { display: none; animation: fadeIn 0.3s; }
+        .module.active { display: block; }
+
+        /* ─── TOOLBAR ─── */
+        .toolbar {
+            background: var(--dark2);
+            border: 1px solid var(--border-soft);
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .btn-new {
+            background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+            color: var(--black);
+            border: none;
+            padding: 9px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 0.75rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            transition: opacity 0.2s, transform 0.15s;
+        }
+        .btn-new:hover { opacity: 0.88; transform: translateY(-1px); }
+        .filter-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            color: var(--gold-dark);
+            text-transform: uppercase;
+        }
+
+        input, select, textarea {
+            padding: 8px 12px;
+            background: var(--dark3);
+            border: 1px solid var(--border-soft);
+            border-radius: 4px;
+            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.85rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input:focus, select:focus, textarea:focus { border-color: var(--gold); }
+        select option { background: var(--dark3); }
+
+        /* ─── TABLE ─── */
+        .table-responsive {
+            overflow-x: auto;
+            background: var(--dark2);
+            border: 1px solid var(--border-soft);
+            border-radius: 8px;
+        }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th {
+            background: var(--dark3);
+            color: var(--gold);
+            padding: 13px 14px;
+            text-align: left;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+        }
+        td {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border-soft);
+            font-size: 0.85rem;
+            color: var(--text-soft);
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(201,168,76,0.04); color: var(--text); cursor: pointer; }
+
+        /* ─── BADGES ─── */
+        .badge {
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            display: inline-block;
+            min-width: 80px;
+            text-align: center;
+        }
+        .bg-pendiente  { background: rgba(201,168,76,0.15);  color: var(--gold-light); border: 1px solid rgba(201,168,76,0.3); }
+        .bg-proceso    { background: rgba(74,144,217,0.15);  color: #7db8f0; border: 1px solid rgba(74,144,217,0.3); }
+        .bg-completada { background: rgba(76,175,122,0.15);  color: #7fcc9e; border: 1px solid rgba(76,175,122,0.3); }
+        .bg-cancelada  { background: rgba(217,82,82,0.15);   color: #f08080; border: 1px solid rgba(217,82,82,0.3); }
+        .bg-disponible { background: rgba(76,175,122,0.15);  color: #7fcc9e; border: 1px solid rgba(76,175,122,0.3); }
+        .bg-vendido    { background: rgba(217,82,82,0.15);   color: #f08080; border: 1px solid rgba(217,82,82,0.3); }
+        .bg-separado   { background: rgba(201,168,76,0.15);  color: var(--gold-light); border: 1px solid rgba(201,168,76,0.3); }
+        .bg-arrendado  { background: rgba(156,103,201,0.15); color: #c49ae8; border: 1px solid rgba(156,103,201,0.3); }
+        .bg-inactivo   { background: rgba(85,85,85,0.2);     color: #888; border: 1px solid rgba(85,85,85,0.3); }
+
+        .badge-destacado {
+            background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+            color: var(--black);
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 0.6rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+
+        /* ─── MODAL ─── */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            background: var(--dark2);
+            border: 1px solid var(--border);
+            margin: 2% auto;
+            width: 95%;
+            max-width: 720px;
+            border-radius: 10px;
+            max-height: 92vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,168,76,0.08);
+        }
+        .modal-header {
+            background: linear-gradient(135deg, var(--dark3), var(--dark2));
+            border-bottom: 1px solid var(--border);
+            padding: 18px 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 10px 10px 0 0;
+        }
+        .modal-header h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gold-light);
+            letter-spacing: 1px;
+        }
+        .modal-close {
+            color: var(--muted);
+            font-size: 1.4rem;
+            cursor: pointer;
+            line-height: 1;
+            transition: color 0.2s;
+            background: none;
+            border: none;
+        }
+        .modal-close:hover { color: var(--gold); }
+        .modal-body {
+            padding: 22px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .modal-body .full-width { grid-column: span 2; }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--gold-dark);
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea { width: 100%; }
+        .form-group textarea { height: 85px; resize: vertical; }
+
+        input:disabled, select:disabled, textarea:disabled {
+            background: var(--dark);
+            color: var(--muted);
+            border-color: rgba(255,255,255,0.04);
+            cursor: not-allowed;
+        }
+
+        .section-divider {
+            grid-column: span 2;
+            border: none;
+            border-top: 1px solid var(--border-soft);
+            margin: 4px 0;
+        }
+        .section-title {
+            grid-column: span 2;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: -6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, var(--gold-dark), transparent);
+        }
+
+        .modal-footer {
+            padding: 16px 22px;
+            text-align: right;
+            border-top: 1px solid var(--border-soft);
+        }
+        .btn-save {
+            background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+            color: var(--black);
+            padding: 10px 28px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            transition: opacity 0.2s;
+        }
+        .btn-save:hover { opacity: 0.85; }
+        .btn-save:disabled { background: var(--dark4); color: var(--muted); cursor: wait; }
+
+        /* Fotos */
+        .fotos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; margin-top: 6px; }
+        .foto-thumb { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 5px; border: 1px solid var(--border); cursor: pointer; transition: opacity 0.2s; }
+        .foto-thumb:hover { opacity: 0.8; }
+        .video-link { display: inline-block; margin-top: 10px; color: var(--gold); font-weight: 600; text-decoration: none; font-size: 0.85rem; }
+        .video-link:hover { text-decoration: underline; }
+
+        /* Footer */
+        footer {
+            background: var(--dark2);
+            border-top: 1px solid var(--border-soft);
+            padding: 20px;
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--muted);
+            letter-spacing: 1px;
+        }
+        footer strong { color: var(--gold); }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 600px) {
+            .modal-body { grid-template-columns: 1fr; }
+            .modal-body .full-width, .section-divider, .section-title { grid-column: span 1; }
+            .section-title::after { display: none; }
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<header>
+    <div id="loading">🔄 Sincronizando...</div>
+    <div class="header-inner">
+        <div class="logo-mark">NOVI<span>GROUP</span></div>
+        <div class="header-divider"></div>
+        <div class="header-sub">Gestión Inmobiliaria</div>
+        <div class="header-title">Sistema CRM · Propiedades · Clientes · Tareas</div>
+    </div>
+</header>
+
+<div class="tabs">
+    <button class="tab-btn active" onclick="verModulo('tareas', this)">TAREAS</button>
+    <button class="tab-btn" onclick="verModulo('propiedades', this)">PROPIEDADES</button>
+    <button class="tab-btn" onclick="verModulo('clientes', this)">CLIENTES</button>
+</div>
+
+<!-- ═══ MÓDULO TAREAS ═══ -->
+<div id="mod-tareas" class="container module active">
+    <div class="toolbar">
+        <button class="btn-new" onclick="abrirModalTarea(true)">+ Nueva Tarea</button>
+        <span class="filter-label">| Filtros:</span>
+        <input type="date" id="fTarFecha" onchange="renderTareas()" title="Filtrar Fecha">
+        <select id="fTarResp" onchange="renderTareas()">
+            <option value="">Resp: Todos</option>
+            <option value="JOHN SEPULVEDA">JOHN SEPULVEDA</option>
+            <option value="YURY MUÑOZ">YURY MUÑOZ</option>
+            <option value="CRISTIAN ARANGO">CRISTIAN ARANGO</option>
+        </select>
+        <select id="fTarEstado" onchange="renderTareas()">
+            <option value="">Est: Todos</option>
+            <option value="PENDIENTE">PENDIENTE</option>
+            <option value="EN PROCESO">EN PROCESO</option>
+            <option value="COMPLETADA">COMPLETADA</option>
+            <option value="CANCELADA">CANCELADA</option>
+        </select>
+    </div>
+    <div class="table-responsive">
+        <table>
+            <thead><tr><th>Fecha</th><th>Cliente</th><th>Tarea</th><th>Responsable</th><th>Estado</th><th>Notas</th></tr></thead>
+            <tbody id="tblTareas"><tr><td colspan="6"><div class="empty-state">Cargando...</div></td></tr></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ═══ MÓDULO PROPIEDADES ═══ -->
+<div id="mod-propiedades" class="container module">
+    <div class="toolbar">
+        <button class="btn-new" onclick="abrirModalPropiedad(true)">+ Nueva Propiedad</button>
+        <span class="filter-label">| Filtros:</span>
+        <select id="fProNeg" onchange="renderPropiedades()">
+            <option value="">Negocio: Todos</option>
+            <option value="VENTA">VENTA</option>
+            <option value="ARRIENDO">ARRIENDO</option>
+            <option value="PERMUTA">PERMUTA</option>
+        </select>
+        <select id="fProTipo" onchange="renderPropiedades()">
+            <option value="">Tipo: Todos</option>
+            <option value="CASA">CASA</option>
+            <option value="APARTAMENTO">APARTAMENTO</option>
+            <option value="LOTE">LOTE</option>
+            <option value="FINCA">FINCA</option>
+            <option value="LOCAL">LOCAL</option>
+            <option value="OFICINA">OFICINA</option>
+            <option value="BODEGA">BODEGA</option>
+        </select>
+        <select id="fProEstado" onchange="renderPropiedades()">
+            <option value="">Estado: Todos</option>
+            <option value="DISPONIBLE">DISPONIBLE</option>
+            <option value="SEPARADO">SEPARADO</option>
+            <option value="VENDIDO">VENDIDO</option>
+            <option value="ARRENDADO">ARRENDADO</option>
+            <option value="INACTIVO">INACTIVO</option>
+        </select>
+        <select id="fProCiudad" onchange="renderPropiedades()">
+            <option value="">Ciudad: Todas</option>
+        </select>
+    </div>
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr><th>ID</th><th>Título</th><th>Negocio</th><th>Tipo</th><th>Ciudad</th><th>Precio</th><th>Área</th><th>Estado</th></tr>
+            </thead>
+            <tbody id="tblPropiedades"><tr><td colspan="8"><div class="empty-state">Cargando...</div></td></tr></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ═══ MÓDULO CLIENTES ═══ -->
+<div id="mod-clientes" class="container module">
+    <div class="toolbar">
+        <button class="btn-new" onclick="abrirModalCliente(true)">+ Nuevo Cliente</button>
+        <span class="filter-label">| Filtros:</span>
+        <select id="fCliTipo" onchange="renderClientes()">
+            <option value="">Tipo: Todos</option>
+            <option value="VENTA">VENTA</option>
+            <option value="ADMINISTRACION">ADMINISTRACION</option>
+            <option value="CREDITO/SUBSIDIO">CREDITO/SUBSIDIO</option>
+        </select>
+        <select id="fCliEstado" onchange="renderClientes()">
+            <option value="">Est: Todos</option>
+            <option value="PENDIENTE">PENDIENTE</option>
+            <option value="EN PROCESO">EN PROCESO</option>
+            <option value="COMPLETADA">COMPLETADA</option>
+            <option value="CANCELADA">CANCELADA</option>
+        </select>
+    </div>
+    <div class="table-responsive">
+        <table>
+            <thead><tr><th>Nombre</th><th>Cédula</th><th>Teléfono</th><th>Tipo</th><th>Estado</th><th>Notas</th></tr></thead>
+            <tbody id="tblClientes"><tr><td colspan="6"><div class="empty-state">Cargando...</div></td></tr></tbody>
+        </table>
+    </div>
+</div>
+
+<footer>
+    NOVIGROUP INMOBILIARIA &nbsp;·&nbsp; <strong>CRM v1.0.0</strong> &nbsp;·&nbsp; &copy; 2026
+</footer>
+
+<!-- ═══ MODAL TAREA ═══ -->
+<div id="modalTarea" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="tModalTar">Gestión de Tarea</h3>
+            <button class="modal-close" onclick="cerrarModales()">×</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="tarId">
+            <input type="hidden" id="tarModo">
+            <div class="form-group full-width">
+                <label>Cliente (Base de Datos)</label>
+                <select id="tarCliente"><option value="">Cargando lista...</option></select>
+            </div>
+            <div class="form-group full-width">
+                <label>Descripción de la Tarea</label>
+                <textarea id="tarDesc" placeholder="Describa la tarea..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Responsable</label>
+                <select id="tarResp">
+                    <option value="">Seleccione...</option>
+                    <option value="JOHN SEPULVEDA">JOHN SEPULVEDA</option>
+                    <option value="YURY MUÑOZ">YURY MUÑOZ</option>
+                    <option value="CRISTIAN ARANGO">CRISTIAN ARANGO</option>
+                </select>
+            </div>
+            <div class="form-group" id="divTarEst">
+                <label>Estado</label>
+                <select id="tarEst">
+                    <option value="PENDIENTE">PENDIENTE</option>
+                    <option value="EN PROCESO">EN PROCESO</option>
+                    <option value="COMPLETADA">COMPLETADA</option>
+                    <option value="CANCELADA">CANCELADA</option>
+                </select>
+            </div>
+            <div class="form-group full-width" id="divTarNotas">
+                <label>Notas de Seguimiento</label>
+                <textarea id="tarNotas"></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-save" onclick="guardarTarea()">Guardar Cambios</button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ MODAL PROPIEDAD ═══ -->
+<div id="modalPropiedad" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="tModalPro">Gestión de Propiedad</h3>
+            <button class="modal-close" onclick="cerrarModales()">×</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="proId">
+            <input type="hidden" id="proModo">
+
+            <div class="section-title">Identificación</div>
+            <div class="form-group full-width">
+                <label>Título de la Propiedad</label>
+                <input type="text" id="proTitulo" placeholder="Ej: Apartamento moderno en el centro">
+            </div>
+            <div class="form-group">
+                <label>Tipo de Negocio</label>
+                <select id="proNegocio">
+                    <option value="VENTA">VENTA</option>
+                    <option value="ARRIENDO">ARRIENDO</option>
+                    <option value="PERMUTA">PERMUTA</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Tipo de Inmueble</label>
+                <select id="proTipo">
+                    <option value="CASA">CASA</option>
+                    <option value="APARTAMENTO">APARTAMENTO</option>
+                    <option value="LOTE">LOTE</option>
+                    <option value="FINCA">FINCA</option>
+                    <option value="LOCAL">LOCAL</option>
+                    <option value="OFICINA">OFICINA</option>
+                    <option value="BODEGA">BODEGA</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Estado</label>
+                <select id="proEstado">
+                    <option value="DISPONIBLE">DISPONIBLE</option>
+                    <option value="SEPARADO">SEPARADO</option>
+                    <option value="VENDIDO">VENDIDO</option>
+                    <option value="ARRENDADO">ARRENDADO</option>
+                    <option value="INACTIVO">INACTIVO</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Destacado</label>
+                <select id="proDestacado">
+                    <option value="NO">NO</option>
+                    <option value="SI">SI</option>
+                </select>
+            </div>
+
+            <hr class="section-divider">
+            <div class="section-title">Ubicación</div>
+            <div class="form-group"><label>País</label><input type="text" id="proPais" value="Colombia"></div>
+            <div class="form-group"><label>Departamento</label><input type="text" id="proDepartamento"></div>
+            <div class="form-group"><label>Ciudad</label><input type="text" id="proCiudad"></div>
+            <div class="form-group"><label>Localidad / Barrio</label><input type="text" id="proLocalidad" placeholder="Ej: El Poblado"></div>
+
+            <hr class="section-divider">
+            <div class="section-title">Características</div>
+            <div class="form-group"><label>Precio (COP)</label><input type="number" id="proPrecio"></div>
+            <div class="form-group"><label>Área (m²)</label><input type="number" id="proArea"></div>
+            <div class="form-group"><label>Alcobas</label><input type="number" id="proAlcobas" min="0"></div>
+            <div class="form-group"><label>Baños</label><input type="number" id="proBanos" min="0"></div>
+            <div class="form-group">
+                <label>Estrato</label>
+                <select id="proEstrato">
+                    <option value="">Seleccione...</option>
+                    <option>1</option><option>2</option><option>3</option>
+                    <option>4</option><option>5</option><option>6</option>
+                </select>
+            </div>
+            <div class="form-group"><label>Piso</label><input type="number" id="proPiso" min="0"></div>
+            <div class="form-group"><label>Año de Construcción</label><input type="number" id="proAno" placeholder="Ej: 2010"></div>
+            <div class="form-group"><label>Admin (COP/mes)</label><input type="number" id="proAdmin"></div>
+            <div class="form-group"><label>Garaje (cantidad)</label><input type="number" id="proGaraje" min="0" value="0"></div>
+            <div class="form-group"><label>Parqueaderos Internos</label><input type="number" id="proInternas" min="0" value="0"></div>
+            <div class="form-group"><label>Parqueaderos Externos</label><input type="number" id="proExternas" min="0" value="0"></div>
+
+            <hr class="section-divider">
+            <div class="section-title">Descripción</div>
+            <div class="form-group full-width">
+                <label>Descripción para Publicación</label>
+                <textarea id="proDescripcion" style="height:100px;" placeholder="Describa la propiedad..."></textarea>
+            </div>
+
+            <!-- Fotos (solo lectura al editar) -->
+            <div id="divFotos" style="display:none;" class="full-width">
+                <hr class="section-divider" style="margin-bottom:10px;">
+                <div class="section-title" style="margin-bottom:10px;">Fotos</div>
+                <div class="fotos-grid" id="fotosGrid"></div>
+                <div id="videoLink"></div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-save" onclick="guardarPropiedad()">Guardar Propiedad</button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ MODAL CLIENTE ═══ -->
+<div id="modalCliente" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="tModalCli">Gestión de Cliente</h3>
+            <button class="modal-close" onclick="cerrarModales()">×</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="cliId">
+            <input type="hidden" id="cliModo">
+            <div class="form-group"><label>Nombre</label><input type="text" id="cliNom"></div>
+            <div class="form-group"><label>Cédula / NIT</label><input type="text" id="cliCed"></div>
+            <div class="form-group"><label>Teléfono</label><input type="text" id="cliTel"></div>
+            <div class="form-group"><label>Correo</label><input type="text" id="cliCor"></div>
+            <div class="form-group full-width"><label>Dirección</label><input type="text" id="cliDir"></div>
+            <div class="form-group"><label>Presupuesto / Valor</label><input type="text" id="cliPre"></div>
+            <div class="form-group">
+                <label>Tipo de Servicio</label>
+                <select id="cliTipo">
+                    <option value="VENTA">VENTA</option>
+                    <option value="ADMINISTRACION">ADMINISTRACION</option>
+                    <option value="CREDITO/SUBSIDIO">CREDITO/SUBSIDIO</option>
+                </select>
+            </div>
+            <div class="form-group" id="divCliEst">
+                <label>Estado</label>
+                <select id="cliEst">
+                    <option value="PENDIENTE">PENDIENTE</option>
+                    <option value="EN PROCESO">EN PROCESO</option>
+                    <option value="COMPLETADA">COMPLETADA</option>
+                    <option value="CANCELADA">CANCELADA</option>
+                </select>
+            </div>
+            <div class="form-group full-width" id="divCliNotas">
+                <label>Notas / Observaciones</label>
+                <textarea id="cliNotas"></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-save" onclick="guardarCliente()">Guardar Cambios</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ════════════════════════════════════════════════════
+    // CONFIGURACIÓN — Reemplaza con tu URL de Apps Script
+    // ════════════════════════════════════════════════════
+    const API = "TU_URL_APPS_SCRIPT_AQUI";
+    // Si usas un script separado para propiedades (como Monteclaro):
+    const API_PROP = "TU_URL_APPS_SCRIPT_PROPIEDADES_AQUI"; // Puede ser igual al API si todo está en uno
+    // CSV público de la hoja PROPIEDADES (opcional, para lectura rápida)
+    const CSV_PROPIEDADES = "TU_URL_CSV_PROPIEDADES_AQUI";
+    // ════════════════════════════════════════════════════
+
+    let dTar = [], dCli = [], dProp = [];
+
+    window.onload = () => {
+        cargarTareas();
+        cargarPropiedades();
+        cargarClientes(true);
+    };
+
+    function verModulo(m, btn) {
+        document.querySelectorAll('.module').forEach(e => e.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
+        document.getElementById('mod-' + m).classList.add('active');
+        btn.classList.add('active');
+    }
+
+    // ─── CARGA DE DATOS ───
+    async function cargarTareas() {
+        try {
+            let r = await fetch(API + "?action=read_tareas");
+            let j = await r.json();
+            if (j.status === 'success') { dTar = j.data; renderTareas(); }
+        } catch(e) { console.error(e); }
+    }
+
+    async function cargarClientes(silencioso = false) {
+        if (!silencioso) showLoading(true);
+        try {
+            let r = await fetch(API + "?action=read_clientes");
+            let j = await r.json();
+            if (j.status === 'success') { dCli = j.data; renderClientes(); }
+        } catch(e) { console.error(e); }
+        if (!silencioso) showLoading(false);
+    }
+
+    async function cargarPropiedades() {
+        document.getElementById('tblPropiedades').innerHTML = "<tr><td colspan='8'><div class='empty-state'>🔄 Cargando propiedades...</div></td></tr>";
+        try {
+            // Intenta primero por CSV público (más rápido), si no, por API
+            if (CSV_PROPIEDADES && CSV_PROPIEDADES !== "TU_URL_CSV_PROPIEDADES_AQUI") {
+                let r = await fetch(CSV_PROPIEDADES);
+                let texto = await r.text();
+                dProp = parsearCSV(texto);
+            } else {
+                let r = await fetch(API + "?action=read_propiedades");
+                let j = await r.json();
+                if (j.status === 'success') dProp = j.data;
+            }
+            poblarFiltroCiudad();
+            renderPropiedades();
+        } catch(e) {
+            console.error(e);
+            document.getElementById('tblPropiedades').innerHTML = "<tr><td colspan='8'><div class='empty-state' style='color:#f08080'>Error al cargar propiedades</div></td></tr>";
+        }
+    }
+
+    function parsearCSV(texto) {
+        let lineas = texto.split('\n').filter(l => l.trim() !== '');
+        if (lineas.length < 2) return [];
+        let headers = parsearLineaCSV(lineas[0]);
+        return lineas.slice(1).map(linea => {
+            let vals = parsearLineaCSV(linea);
+            let obj = {};
+            headers.forEach((h, i) => obj[h.trim().toUpperCase()] = (vals[i] || '').trim());
+            return obj;
+        }).filter(o => Object.values(o).some(v => v));
+    }
+
+    function parsearLineaCSV(linea) {
+        let res = [], cur = '', inQ = false;
+        for (let c of linea) {
+            if (c === '"') inQ = !inQ;
+            else if (c === ',' && !inQ) { res.push(cur); cur = ''; }
+            else cur += c;
+        }
+        res.push(cur);
+        return res;
+    }
+
+    function poblarFiltroCiudad() {
+        let sel = document.getElementById('fProCiudad');
+        let ciudades = [...new Set(dProp.map(p => p.CIUDAD).filter(Boolean))].sort();
+        sel.innerHTML = '<option value="">Ciudad: Todas</option>';
+        ciudades.forEach(c => { let o = document.createElement('option'); o.value = c; o.text = c; sel.appendChild(o); });
+    }
+
+    function showLoading(show) {
+        document.getElementById('loading').style.display = show ? 'block' : 'none';
+    }
+
+    // ─── RENDERIZADO ───
+    function renderTareas() {
+        let tb = document.getElementById('tblTareas');
+        tb.innerHTML = "";
+        let fF = document.getElementById('fTarFecha').value;
+        let fR = document.getElementById('fTarResp').value;
+        let fE = document.getElementById('fTarEstado').value;
+        let fil = dTar.filter(i => {
+            let fechaOk = !fF || (i.FECHA || "").includes(fF) || (i.FECHA && new Date(i.FECHA).toISOString().startsWith(fF));
+            return fechaOk && (!fR || i.RESPONSABLE == fR) && (!fE || i.ESTADO == fE);
+        });
+        if (!fil.length) { tb.innerHTML = "<tr><td colspan='6'><div class='empty-state'>Sin resultados</div></td></tr>"; return; }
+        fil.forEach(i => {
+            let tr = document.createElement('tr');
+            tr.onclick = () => abrirModalTarea(false, i);
+            let fechaStr = i.FECHA ? new Date(i.FECHA).toLocaleDateString('es-CO') : '';
+            tr.innerHTML = `<td>${fechaStr}</td><td>${i.CLIENTE||''}</td><td>${i.TAREA||i.ACTIVIDAD||''}</td><td>${i.RESPONSABLE||''}</td>
+                            <td><span class="badge ${color(i.ESTADO)}">${i.ESTADO||''}</span></td>
+                            <td><small style="color:var(--muted)">${i.NOTAS||''}</small></td>`;
+            tb.appendChild(tr);
+        });
+    }
+
+    function renderPropiedades() {
+        let tb = document.getElementById('tblPropiedades');
+        tb.innerHTML = "";
+        let fN = document.getElementById('fProNeg').value;
+        let fT = document.getElementById('fProTipo').value;
+        let fE = document.getElementById('fProEstado').value;
+        let fC = document.getElementById('fProCiudad').value;
+        let fil = dProp.filter(i => (!fN || i.NEGOCIO==fN) && (!fT || i.TIPO==fT) && (!fE || i.ESTADO==fE) && (!fC || i.CIUDAD==fC));
+        if (!fil.length) { tb.innerHTML = "<tr><td colspan='8'><div class='empty-state'>Sin propiedades</div></td></tr>"; return; }
+        fil.forEach(i => {
+            let tr = document.createElement('tr');
+            tr.onclick = () => abrirModalPropiedad(false, i);
+            let precio = i.PRECIO ? new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0}).format(i.PRECIO) : '$0';
+            let dest = i.DESTACADO === 'SI' ? '<span class="badge-destacado">⭐ DEST.</span>' : '';
+            tr.innerHTML = `
+                <td><small style="color:var(--gold-dark)">${i.ID||''}</small></td>
+                <td style="color:var(--text)">${i.TITULO||''}${dest}</td>
+                <td>${i.NEGOCIO||''}</td>
+                <td>${i.TIPO||''}</td>
+                <td><small>${i.CIUDAD||''}${i.LOCALIDAD?', '+i.LOCALIDAD:''}</small></td>
+                <td style="color:var(--gold);font-weight:600">${precio}</td>
+                <td>${i.AREA?i.AREA+'m²':''}</td>
+                <td><span class="badge ${color(i.ESTADO)}">${i.ESTADO||''}</span></td>`;
+            tb.appendChild(tr);
+        });
+    }
+
+    function renderClientes() {
+        let tb = document.getElementById('tblClientes');
+        tb.innerHTML = "";
+        let fT = document.getElementById('fCliTipo').value;
+        let fE = document.getElementById('fCliEstado').value;
+        let fil = dCli.filter(i => (!fT || i.TIPO_SERVICIO==fT) && (!fE || i.ESTADO_CLIENTE==fE));
+        if (!fil.length) { tb.innerHTML = "<tr><td colspan='6'><div class='empty-state'>Sin resultados</div></td></tr>"; return; }
+        fil.forEach(i => {
+            let tr = document.createElement('tr');
+            tr.onclick = () => abrirModalCliente(false, i);
+            tr.innerHTML = `<td style="color:var(--text)">${i.NOMBRE||''}</td><td>${i.CEDULA_NIT||''}</td><td>${i.TELEFONO||''}</td>
+                            <td>${i.TIPO_SERVICIO||''}</td>
+                            <td><span class="badge ${color(i.ESTADO_CLIENTE)}">${i.ESTADO_CLIENTE||''}</span></td>
+                            <td><small style="color:var(--muted)">${i.NOTAS||''}</small></td>`;
+            tb.appendChild(tr);
+        });
+    }
+
+    // ─── MODALES ───
+    function abrirModalTarea(esNuevo, item) {
+        document.getElementById('modalTarea').style.display = 'block';
+        let sel = document.getElementById('tarCliente');
+        sel.innerHTML = '<option value="">Seleccione Cliente...</option>';
+        [...dCli].sort((a,b) => (a.NOMBRE||"").localeCompare(b.NOMBRE||"")).forEach(c => {
+            let o = document.createElement('option');
+            o.value = c.NOMBRE; o.text = c.NOMBRE; sel.appendChild(o);
+        });
+        if (esNuevo) {
+            document.getElementById('tModalTar').innerText = "Nueva Tarea";
+            document.getElementById('tarModo').value = "create";
+            document.getElementById('tarId').value = "";
+            sel.value = ""; sel.disabled = false;
+            document.getElementById('tarDesc').value = ""; document.getElementById('tarDesc').disabled = false;
+            document.getElementById('tarResp').value = ""; document.getElementById('tarResp').disabled = false;
+            document.getElementById('tarEst').value = "PENDIENTE";
+            document.getElementById('tarNotas').value = "";
+            document.getElementById('divTarNotas').style.display = 'none';
+        } else {
+            document.getElementById('tModalTar').innerText = "Editar Tarea";
+            document.getElementById('tarModo').value = "edit";
+            document.getElementById('tarId').value = item.ID || item.ID_TAREA || '';
+            sel.value = item.CLIENTE; sel.disabled = true;
+            document.getElementById('tarDesc').value = item.TAREA || item.ACTIVIDAD || ''; document.getElementById('tarDesc').disabled = true;
+            document.getElementById('tarResp').value = item.RESPONSABLE; document.getElementById('tarResp').disabled = true;
+            document.getElementById('tarEst').value = item.ESTADO || 'PENDIENTE';
+            document.getElementById('tarNotas').value = item.NOTAS || '';
+            document.getElementById('divTarNotas').style.display = 'block';
+        }
+    }
+
+    function abrirModalPropiedad(esNuevo, item) {
+        document.getElementById('modalPropiedad').style.display = 'block';
+        document.getElementById('divFotos').style.display = 'none';
+        document.getElementById('fotosGrid').innerHTML = '';
+        document.getElementById('videoLink').innerHTML = '';
+        const campos = ['proTitulo','proNegocio','proTipo','proEstado','proDestacado',
+                        'proPais','proDepartamento','proCiudad','proLocalidad',
+                        'proPrecio','proArea','proAlcobas','proBanos','proEstrato',
+                        'proPiso','proAno','proAdmin','proGaraje','proInternas','proExternas','proDescripcion'];
+        if (esNuevo) {
+            document.getElementById('tModalPro').innerText = "Nueva Propiedad";
+            document.getElementById('proModo').value = "create";
+            document.getElementById('proId').value = "";
+            campos.forEach(id => { let el = document.getElementById(id); if(el){el.value="";el.disabled=false;} });
+            document.getElementById('proPais').value = "Colombia";
+            document.getElementById('proEstado').value = "DISPONIBLE";
+            document.getElementById('proDestacado').value = "NO";
+            document.getElementById('proGaraje').value = "0";
+            document.getElementById('proInternas').value = "0";
+            document.getElementById('proExternas').value = "0";
+        } else {
+            document.getElementById('tModalPro').innerText = "Propiedad: " + (item.ID || '');
+            document.getElementById('proModo').value = "edit";
+            document.getElementById('proId').value = item.ID || '';
+            document.getElementById('proTitulo').value       = item.TITULO || '';
+            document.getElementById('proNegocio').value      = item.NEGOCIO || '';
+            document.getElementById('proTipo').value         = item.TIPO || '';
+            document.getElementById('proEstado').value       = item.ESTADO || 'DISPONIBLE';
+            document.getElementById('proDestacado').value    = item.DESTACADO || 'NO';
+            document.getElementById('proPais').value         = item.PAIS || 'Colombia';
+            document.getElementById('proDepartamento').value = item.DEPARTAMENTO || '';
+            document.getElementById('proCiudad').value       = item.CIUDAD || '';
+            document.getElementById('proLocalidad').value    = item.LOCALIDAD || '';
+            document.getElementById('proPrecio').value       = item.PRECIO || '';
+            document.getElementById('proArea').value         = item.AREA || '';
+            document.getElementById('proAlcobas').value      = item.ALCOBAS || '';
+            document.getElementById('proBanos').value        = item.BANOS || '';
+            document.getElementById('proEstrato').value      = item.ESTRATO || '';
+            document.getElementById('proPiso').value         = item.PISO || '';
+            document.getElementById('proAno').value          = item.ANO || '';
+            document.getElementById('proAdmin').value        = item.ADMIN || '';
+            document.getElementById('proGaraje').value       = item.GARAJE || '0';
+            document.getElementById('proInternas').value     = item.INTERNAS || '0';
+            document.getElementById('proExternas').value     = item.EXTERNAS || '0';
+            document.getElementById('proDescripcion').value  = item.DESCRIPCION || '';
+            // Bloquear campos de identificación
+            ['proTitulo','proNegocio','proTipo','proPais','proDepartamento','proCiudad',
+             'proLocalidad','proArea','proAlcobas','proBanos','proEstrato','proPiso','proAno'].forEach(id => {
+                let el = document.getElementById(id); if(el) el.disabled = true;
+            });
+            // Fotos
+            let fotos = [];
+            for(let i = 1; i <= 10; i++) { let u = item['FOTO'+i]; if(u&&u.trim()) fotos.push(u.trim()); }
+            if(fotos.length || (item.VIDEO&&item.VIDEO.trim())) {
+                document.getElementById('divFotos').style.display = 'block';
+                fotos.forEach(url => {
+                    let img = document.createElement('img');
+                    img.src = url; img.className = 'foto-thumb';
+                    img.onclick = () => window.open(url,'_blank');
+                    img.onerror = () => img.style.display = 'none';
+                    document.getElementById('fotosGrid').appendChild(img);
+                });
+                if(item.VIDEO&&item.VIDEO.trim())
+                    document.getElementById('videoLink').innerHTML = `<a href="${item.VIDEO.trim()}" target="_blank" class="video-link">🎥 Ver video de la propiedad</a>`;
+            }
+        }
+    }
+
+    function abrirModalCliente(esNuevo, item) {
+        document.getElementById('modalCliente').style.display = 'block';
+        let ids = ['cliNom','cliCed','cliTel','cliCor','cliDir','cliPre','cliTipo'];
+        if (esNuevo) {
+            document.getElementById('tModalCli').innerText = "Nuevo Cliente";
+            document.getElementById('cliModo').value = "create";
+            document.getElementById('cliId').value = "";
+            ids.forEach(id => { let el = document.getElementById(id); el.value=""; el.disabled=false; });
+            document.getElementById('cliEst').value = "PENDIENTE";
+            document.getElementById('divCliNotas').style.display = 'none';
+        } else {
+            document.getElementById('tModalCli').innerText = "Editar Cliente";
+            document.getElementById('cliModo').value = "edit";
+            document.getElementById('cliId').value = item.ID_CLIENTE || item.ID || '';
+            document.getElementById('cliNom').value = item.NOMBRE || '';
+            document.getElementById('cliCed').value = item.CEDULA_NIT || '';
+            document.getElementById('cliTel').value = item.TELEFONO || '';
+            document.getElementById('cliCor').value = item.CORREO || '';
+            document.getElementById('cliDir').value = item.DIRECCION || '';
+            document.getElementById('cliPre').value = item.PRESUPUESTO || '';
+            document.getElementById('cliTipo').value = item.TIPO_SERVICIO || '';
+            document.getElementById('cliEst').value = item.ESTADO_CLIENTE || 'PENDIENTE';
+            document.getElementById('cliNotas').value = item.NOTAS || '';
+            ids.forEach(id => document.getElementById(id).disabled = true);
+            document.getElementById('divCliNotas').style.display = 'block';
+        }
+    }
+
+    // ─── GUARDAR ───
+    async function guardarTarea() {
+        let modo = document.getElementById('tarModo').value;
+        let btn = document.querySelector('#modalTarea .btn-save');
+        if(modo == 'create' && !document.getElementById('tarCliente').value) return alert("Seleccione un cliente");
+        let fd = new FormData();
+        if(modo == 'create') {
+            fd.append('action','create_tarea');
+            fd.append('cliente',     document.getElementById('tarCliente').value);
+            fd.append('tarea',       document.getElementById('tarDesc').value);
+            fd.append('responsable', document.getElementById('tarResp').value);
+            fd.append('estado',      document.getElementById('tarEst').value);
+        } else {
+            fd.append('action','update_tarea');
+            fd.append('id',     document.getElementById('tarId').value);
+            fd.append('estado', document.getElementById('tarEst').value);
+            fd.append('notas',  document.getElementById('tarNotas').value);
+        }
+        await enviar(fd, btn, cargarTareas);
+    }
+
+    async function guardarPropiedad() {
+        let modo = document.getElementById('proModo').value;
+        let btn = document.querySelector('#modalPropiedad .btn-save');
+        let datos;
+        if(modo == 'create') {
+            if(!document.getElementById('proTitulo').value) return alert("Ingrese el título de la propiedad");
+            datos = {
+                action:'create_propiedad',
+                titulo:       document.getElementById('proTitulo').value,
+                negocio:      document.getElementById('proNegocio').value,
+                tipo:         document.getElementById('proTipo').value,
+                estado:       document.getElementById('proEstado').value,
+                destacado:    document.getElementById('proDestacado').value,
+                pais:         document.getElementById('proPais').value,
+                departamento: document.getElementById('proDepartamento').value,
+                ciudad:       document.getElementById('proCiudad').value,
+                localidad:    document.getElementById('proLocalidad').value,
+                precio:       document.getElementById('proPrecio').value,
+                area:         document.getElementById('proArea').value,
+                alcobas:      document.getElementById('proAlcobas').value,
+                banos:        document.getElementById('proBanos').value,
+                estrato:      document.getElementById('proEstrato').value,
+                piso:         document.getElementById('proPiso').value,
+                ano:          document.getElementById('proAno').value,
+                admin:        document.getElementById('proAdmin').value,
+                garaje:       document.getElementById('proGaraje').value,
+                internas:     document.getElementById('proInternas').value,
+                externas:     document.getElementById('proExternas').value,
+                descripcion:  document.getElementById('proDescripcion').value
+            };
+        } else {
+            datos = {
+                action:'update_propiedad',
+                id:          document.getElementById('proId').value,
+                estado:      document.getElementById('proEstado').value,
+                precio:      document.getElementById('proPrecio').value,
+                admin:       document.getElementById('proAdmin').value,
+                garaje:      document.getElementById('proGaraje').value,
+                internas:    document.getElementById('proInternas').value,
+                externas:    document.getElementById('proExternas').value,
+                destacado:   document.getElementById('proDestacado').value,
+                descripcion: document.getElementById('proDescripcion').value
+            };
+        }
+        await enviarJSON(datos, btn, cargarPropiedades, API_PROP !== "TU_URL_APPS_SCRIPT_PROPIEDADES_AQUI" ? API_PROP : API);
+    }
+
+    async function guardarCliente() {
+        let modo = document.getElementById('cliModo').value;
+        let btn = document.querySelector('#modalCliente .btn-save');
+        let fd = new FormData();
+        if(modo == 'create') {
+            fd.append('action','create_cliente');
+            fd.append('nombre',      document.getElementById('cliNom').value);
+            fd.append('cedula',      document.getElementById('cliCed').value);
+            fd.append('telefono',    document.getElementById('cliTel').value);
+            fd.append('correo',      document.getElementById('cliCor').value);
+            fd.append('direccion',   document.getElementById('cliDir').value);
+            fd.append('presupuesto', document.getElementById('cliPre').value);
+            fd.append('tipo',        document.getElementById('cliTipo').value);
+            fd.append('estado',      document.getElementById('cliEst').value);
+        } else {
+            fd.append('action','update_cliente');
+            fd.append('id',     document.getElementById('cliId').value);
+            fd.append('estado', document.getElementById('cliEst').value);
+            fd.append('notas',  document.getElementById('cliNotas').value);
+        }
+        await enviar(fd, btn, () => { cargarClientes(); cargarTareas(); });
+    }
+
+    async function enviar(fd, btn, callback) {
+        btn.disabled = true; btn.innerText = "Guardando...";
+        try {
+            await fetch(API, { method: 'POST', body: fd });
+            alert("Guardado exitosamente"); cerrarModales();
+            if(callback) callback();
+        } catch(e) { console.error(e); alert("Error al guardar: " + e.message); }
+        btn.disabled = false; btn.innerText = "Guardar Cambios";
+    }
+
+    async function enviarJSON(datos, btn, callback, apiUrl) {
+        btn.disabled = true; btn.innerText = "Guardando...";
+        try {
+            let r = await fetch(apiUrl || API, { method: 'POST', body: JSON.stringify(datos) });
+            let j = await r.json();
+            if(j.status === 'success') { alert("Guardado exitosamente"); cerrarModales(); if(callback) callback(); }
+            else alert("Error: " + (j.message || 'Error desconocido'));
+        } catch(e) { console.error(e); alert("Error al guardar: " + e.message); }
+        btn.disabled = false; btn.innerText = "Guardar Propiedad";
+    }
+
+    function cerrarModales() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
+
+    function color(e) {
+        if(!e) return '';
+        const m = {
+            'PENDIENTE':'bg-pendiente','EN PROCESO':'bg-proceso','COMPLETADA':'bg-completada','CANCELADA':'bg-cancelada',
+            'DISPONIBLE':'bg-disponible','VENDIDO':'bg-vendido','ARRENDADO':'bg-arrendado','SEPARADO':'bg-separado','INACTIVO':'bg-inactivo'
+        };
+        return m[e] || '';
+    }
+
+    window.onclick = e => { if(e.target.classList.contains('modal')) cerrarModales(); };
+</script>
+
+</body>
+</html>
